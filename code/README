@@ -1,0 +1,97 @@
+README header (definirea structurilor folosite in implementare)
+typedef struct nod {
+    uc info;
+    uc red, green, blue;
+    struct nod *fiu1, *fiu2, *fiu3, *fiu4;
+} TNod, *TArb;
+-> structura arborelui cuaternar cu cei 4 fii, fiecare fiu avand drept informatii tipul si valorile RGB.
+
+typedef struct celula {
+    TArb info;
+    struct celula* urm;
+} TCelula, *TLista;
+
+typedef struct coada {
+    TLista inc, sf;
+} TCoada;
+-> structuri ce definesc un nod al cozii, informatia din acesta fiind de tip TArb, si o coada.
+
+README functiile folosite in program
+TArb InitA() -> functia initializeaza un arbore cuaternar si ii seteaza informatia (tipul si valorile RGB) la 0.
+
+TArb ConstrFr(uc x, uc r, uc g, uc b) -> functia construieste o frunza in arbore si ii atribuie valorile
+pentru tip si RGB precizate in apel.
+
+void DistrugeArb(TArb r) -> functia elibereaza memoria ocupata de arborele cuaternar si il distruge.
+
+void Divizare(uc **R, uc **G, uc **B, ui x, ui y, ui size, ull factor, TArb r) -> functia primeste ca parametri matricele RGB declarate
+in main, x, y, dimensiunea imaginii, factorul si radacina arborelui cuternar. Folosind formulele furnizate 
+in enuntul temei, calculez mean-ul, variabila cu ajutorul caruia voi determina cand se realizeaza 
+divizarea imaginii si felul in care se creeaza arborele cuaternar. 
+In cazul in care valoarea mean-ului este mai mare decat cea a factorului, se construiesc frunzele ce deriveaza
+din nodul curent, se initializeaza informatia din acestea cu 0 si se realizeaza divizarea. In caz contrar (mean < factor) se atribuie 
+nodului curent valorile RGB si tipul corespunzator.
+
+int NrFrunze(TArb r) -> functia numara recursiv frunzele arborelui cuaternar si intoarce numarul acestora.
+
+int NrNiv(TArb r) -> functia numara nivelurile din arbore si intoarce numarul acestora
+
+int NivelMinim(TArb r) -> functia afla frunza de pe nivelul minim al arborelui cuaternar si returneaza
+nivelul acesteia.
+
+void Afisare(TArb r) -> functia afiseaza arborele cuaternar (folosita pentru verificare)
+
+void AfisareNivel(TArb r, int nivel_crt, int nivel, FILE *fout) -> functia afiseaza toate nodurile de pe
+un anumit nivel precizat in cadrul apelului. Aceasta primeste ca parametri arborele cuaternar, nivelul curent,
+nivelul de pe care ne dorim sa afisam nodurile si fisierul de iesire. In cazul in care nivelul curent este cel 
+dorit, se afiseaza informatiile dorite in format binar. Functia se autoapeleaza recursiv pana se ajunge la nivelul
+dorit.
+
+int IntrQ(TCoada *c, TArb x) -> functia introduce un nou element la sfarsitul cozii, informatia dintr-un nod al cozii
+fiind de tip TArb, returnand 1 in caz de succes si 0 in caz de esec.
+
+int ExtrQ(TCoada *c, TArb *x) -> functia extrage elementul din fata cozii, returnand 1 in caz de succes si 0 in caz de esec.
+
+void DistrQ(TCoada **c) -> functia parcurge elementele cozii, elibereaza memoria ocupata de acestea si seteaza
+pointerul de inceput al cozii la NULL, distrugand coada.
+
+TCoada* InitQ() -> functia initializeaza o coada, returnand adresa acesteia.
+
+void CreareImagine(uc **R, uc **G, uc **B, ui x, ui y, ui size, TArb r) -> functia primeste ca parametri cele 3 matrici RGB, 
+x, y, dimensiunea imaginii si arborele cuaternar. Aceasta atribuie matricilor RGB valorile respective crearii imaginii in cazul
+in care nodul curent este de tip frunza, iar in caz contrar se autoapeleaza recursiv pana la ajungerea la un nod frunza.
+
+README main
+Inaintea main-ului se gasesc antetele functiilor definite in fisierul FunctiiArbore.c
+Se citeste cerinta prin intermediul primului parametru din linia de comanda, iar in functie de valoarea
+acestuia se citesc restul argumentelor din linia de comanda.
+
+In cazul in care se doreste verificarea cerintei 1, se citesc tipul fisierului, dimensiunile imaginii, 
+si valoarea maxima pe care o pot lua RGB (255). Prin intermediul a 3 structuri repetitive de tip for se
+aloca dinamic 3 matrici in care voi retine valorile pentru RGB. Apoi, parcurg cele 3 matrici, citesc valorile
+pentrub RGB si le atribui corespunzator.
+Se initialieaza arborele cuaternar, dupa care se apeleaza functia Divizare cu parametrii corespunzatori,
+creandu-se astfel arborele cuaternar corespunzator imaginii. Se apeleaza functiile corespunzatoare rezultatelor
+cerute in cerinta 1 si se afiseaza in fisierul de iesire.
+La sfarsitul programului eliberez memoria alocata dinamic pentru cele 3 matrici RGB si pentru arborele cuaternar.
+
+In cazul in care se doreste verificarea cerintei 2, se citesc tipul fisierului, dimensiunile imaginii, 
+si valoarea maxima pe care o pot lua RGB (255). Prin intermediul a 3 structuri repetitive de tip for se
+aloca dinamic 3 matrici in care voi retine valorile pentru RGB. Apoi, parcurg cele 3 matrici, citesc valorile
+pentru RGB si le atribui corespunzator.
+Se initialieaza arborele cuaternar, dupa care se apeleaza functia Divizare cu parametrii corespunzatori,
+creandu-se astfel arborele cuaternar corespunzator imaginii. Apoi, se afiseaza informatiile cerute in format binar
+conform cerintei in fisierul de output.
+La sfarsitul programului eliberez memoria alocata dinamic pentru cele 3 matrici RGB si pentru arborele cuaternar.
+
+In cazul in care se doreste verificarea cerintei 3, se citeste dimensiunea imaginii, dupa care se initializeaza radacina
+arborelui si coada cu ajutorul careia voi construi noul arbore cuaternar. Coada va fi folosita pentru parcurgerea in latime
+a arborelui cuaternar. Verificand tipul nodului citit, daca acesta nu este frunza, il adaug atat in arborele cuaternar, 
+setandu-i valorile RGB la 0, cat si in coada. In cazul in care nodul este de tip frunza, citesc valorile pentru RGB ale
+acestuia si il adaug in arborele cuaternar. Folosind o structura repetitiva de tip while a carei conditie este extragerea
+cu succes a unui element din coada, pentru fiecare dintre cei 3 fii nodului curent le citesc tipul, si ii adaug in arbore
+cu valorile RGB state la 0. Daca fiul nu este frunza, il adaug in coada, iar daca fiul este frunza ii citesc valorile RGB
+si i le atribui corespunzator in arbore.
+Declar si aloc cele 4 matrici in care retin valorile RGB pentru crearea imgainii. Apelez functia de creare a imaginii cu 
+parametrii corespunzatori, dupa care afisez informatiile conform cerintei. Afisez valorile din matricile RGB.
+La sfarsitul programului eliberez memoria alocata dinamic pentru cele 3 matrici RGB, pentru arborele cuaternar si pentru coada.
